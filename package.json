@@ -1,0 +1,54 @@
+{
+  "name": "@canyonjs/git-provider",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Unified Git provider client for GitHub, GitLab, and Gitea.",
+  "keywords": [
+    "git",
+    "github",
+    "gitlab",
+    "gitea",
+    "api"
+  ],
+  "author": "canyonjs",
+  "license": "MIT",
+  "homepage": "https://git.dev.sh.ctripcorp.com/canyon-project/git-provider#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://git.dev.sh.ctripcorp.com/canyon-project/git-provider.git"
+  },
+  "bugs": {
+    "url": "https://git.dev.sh.ctripcorp.com/canyon-project/git-provider/issues"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@typescript/native-preview": "7.0.0-dev.20260328.1",
+    "bumpp": "^11.0.1",
+    "tsdown": "^0.21.7",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
+  }
+}
