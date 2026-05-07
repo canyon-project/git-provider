@@ -1,0 +1,60 @@
+{
+  "name": "@canyonjs/git-provider",
+  "version": "0.0.5",
+  "description": "GitLab provider client with adapter architecture.",
+  "keywords": [
+    "api",
+    "git",
+    "gitlab"
+  ],
+  "homepage": "https://github.com/canyon-project/git-provider#readme",
+  "bugs": {
+    "url": "https://github.com/canyon-project/git-provider/issues"
+  },
+  "license": "MIT",
+  "author": "canyonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/canyon-project/git-provider.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsgo --noEmit",
+    "prepublishOnly": "pnpm run build",
+    "debug": "tsx src/debug/index.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.17",
+    "axios": "^1.16.0",
+    "diff": "^9.0.0",
+    "tmp": "^0.2.5"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^25.5.0",
+    "@types/tmp": "^0.2.6",
+    "@typescript/native-preview": "7.0.0-dev.20260505.1",
+    "dotenv": "^17.4.2",
+    "oxfmt": "^0.48.0",
+    "oxlint": "^1.63.0",
+    "tsdown": "^0.21.7",
+    "tsx": "^4.21.0",
+    "vitest": "^4.1.2"
+  }
+}
