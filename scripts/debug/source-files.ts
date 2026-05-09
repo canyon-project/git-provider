@@ -1,4 +1,4 @@
-import type { ScmAdapter } from "../adapter";
+import type { ScmAdapter } from "../../src/adapter";
 import type { DebugConfig } from "./env";
 
 export async function runSourceFilesDebug(adapter: ScmAdapter, config: DebugConfig): Promise<void> {

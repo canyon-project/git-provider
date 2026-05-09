@@ -33,7 +33,7 @@
     "test": "vitest run",
     "typecheck": "tsgo --noEmit",
     "prepublishOnly": "pnpm run build",
-    "debug": "tsx src/debug/index.ts",
+    "debug": "tsx scripts/debug/index.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
