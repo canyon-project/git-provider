@@ -1,6 +1,10 @@
 import AdmZip from "adm-zip";
 import type { GitlabMockScenario } from "./mock-gitlab-http-server";
-import { archiveMapKey, compareMapKey, rawMapKey } from "./mock-gitlab-http-server";
+import {
+  archiveMapKey,
+  compareMapKey,
+  rawMapKey,
+} from "./mock-gitlab-http-server";
 
 export type ProjectApiBody = {
   id: number;

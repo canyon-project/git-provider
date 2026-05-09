@@ -12,6 +12,26 @@ import type { Compare, CompareDiffItem, GitlabScmConfig, RepoInfo } from "./type
 /** 唯一路径数超过该值时用 archive.zip；否则并发请求单文件 raw，避免为少量路径拉整仓 */
 const SOURCE_FILES_ARCHIVE_THRESHOLD = 8;
 
+type CompareApiPayload = {
+  /** GitLab 文档：对比范围内「最新」提交，即 `to` 引用解析后的 tip（与 `commits` 中沿时间的末端一致） */
+  commit?: { id: string; created_at?: string };
+  commits?: Array<{ id: string; created_at?: string }>;
+  diffs?: Array<{
+    new_path?: string;
+    old_path?: string;
+    new_file?: boolean;
+    deleted_file?: boolean;
+  }>;
+};
+
+/** 提交 id 列表：完全以 compare 响应为准——有 `commits` 则用其顺序；否则用 `commit.id`（同 ref / 无区间时） */
+function commitIdsFromCompare(data: CompareApiPayload): string[] {
+  const ids = (data.commits ?? []).map((c) => c.id).filter((id) => id !== "");
+  if (ids.length > 0) return ids;
+  const tip = data.commit?.id;
+  return tip != null && tip !== "" ? [tip] : [];
+}
+
 export class GitlabAdapter implements ScmAdapter {
   private readonly base: string;
   private readonly token: string;
@@ -51,18 +71,20 @@ export class GitlabAdapter implements ScmAdapter {
     };
   }
 
-  async getCompare(repoID: string, base: string, head: string): Promise<Compare> {
-    // 1. 请求 GitLab「两个 ref 之间的比较」：提交列表 + 每文件的路径元数据（不依赖 raw 正文）
+  private async fetchComparePayload(repoID: string, base: string, head: string): Promise<CompareApiPayload> {
     const url = `${this.base}/projects/${encodeURIComponent(repoID)}/repository/compare?from=${encodeURIComponent(base)}&to=${encodeURIComponent(head)}`;
-    const { data } = await get<{
-      commits?: Array<{ id: string }>;
-      diffs?: Array<{
-        new_path?: string;
-        old_path?: string;
-        new_file?: boolean;
-        deleted_file?: boolean;
-      }>;
-    }>(url, { headers: this.headers() });
+    const { data } = await get<CompareApiPayload>(url, { headers: this.headers() });
+    return data;
+  }
+
+  async getCommitsBetween(repoID: string, base: string, head: string): Promise<string[]> {
+    const data = await this.fetchComparePayload(repoID, base, head);
+    return commitIdsFromCompare(data);
+  }
+
+  async getCompare(repoID: string, base: string, head: string): Promise<Compare> {
+    const data = await this.fetchComparePayload(repoID, base, head);
+    const commitList = commitIdsFromCompare(data);
 
     // 2. 每条 diff（可能含新增/删除/重命名）；后续只处理有可解析路径的条目
     const diffRows = data.diffs ?? [];
@@ -109,9 +131,9 @@ export class GitlabAdapter implements ScmAdapter {
       })
       .filter((item) => pathMatchesLineDiffExtensions(item.path));
 
-    // 6. 提交 id 列表直接来自 compare 响应；变更文件列表仅白名单后缀，行号可能为空（大批量 compare 或未参与逐行的超大文件）
+    // 6. 提交 id 列表与 getCommitsBetween 一致（来自 compare）；变更文件列表仅白名单后缀，行号可能为空（大批量 compare 或未参与逐行的超大文件）
     return {
-      commitList: (data.commits ?? []).map((c) => c.id),
+      commitList,
       changedFiles,
     };
   }

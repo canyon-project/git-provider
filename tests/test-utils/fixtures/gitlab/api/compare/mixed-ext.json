@@ -1,5 +1,9 @@
 {
-  "commits": [{ "id": "only-one" }],
+  "commit": {
+    "id": "only-one",
+    "created_at": "2020-06-01T00:00:00Z"
+  },
+  "commits": [{ "id": "only-one", "created_at": "2020-06-01T00:00:00Z" }],
   "diffs": [
     {
       "old_path": "src/foo.ts",

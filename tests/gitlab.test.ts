@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { GitlabAdapter } from "../src/gitlab";
 import errCompareNotFound from "./test-utils/fixtures/gitlab/api/errors/compare-not-found.json";
 import errNotFoundProject from "./test-utils/fixtures/gitlab/api/errors/not-found-project.json";
+import compareCommitsBetween from "./test-utils/fixtures/gitlab/api/compare/commits-between.json";
 import compareEmpty from "./test-utils/fixtures/gitlab/api/compare/empty.json";
 import compareMixed from "./test-utils/fixtures/gitlab/api/compare/mixed-ext.json";
 import compareNineTs from "./test-utils/fixtures/gitlab/api/compare/nine-ts.json";
@@ -237,11 +238,11 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
       );
     });
 
-    it("空 compare：commitList 与 changedFiles 为空", async () => {
-      registerCompareResponse(mock.scenario, "p/empty", "a", "b", compareEmpty);
+    it("同 ref 比较：commitList 仅一条，changedFiles 为空", async () => {
+      registerCompareResponse(mock.scenario, "p/empty", "main", "main", compareEmpty);
       const adapter = new GitlabAdapter({ type: "gitlab", base: mock.baseUrl, token: tok });
-      const cmp = await adapter.getCompare("p/empty", "a", "b");
-      expect(cmp.commitList).toEqual([]);
+      const cmp = await adapter.getCompare("p/empty", "main", "main");
+      expect(cmp.commitList).toEqual(["eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"]);
       expect(cmp.changedFiles).toEqual([]);
     });
 
@@ -268,6 +269,30 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
         status: 404,
         data: errCompareNotFound,
       });
+    });
+
+    it("getCommitsBetween：与 compare 返回的 commits 顺序一致", async () => {
+      registerCompareResponse(mock.scenario, "p/cb", "baseR", "headR", compareCommitsBetween);
+      const adapter = new GitlabAdapter({ type: "gitlab", base: mock.baseUrl, token: tok });
+      const shas = await adapter.getCommitsBetween("p/cb", "baseR", "headR");
+      expect(shas).toEqual([
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "cccccccccccccccccccccccccccccccccccccccc",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      ]);
+      expect(mock.requestLog.filter((e) => e.path.endsWith("/repository/compare"))).toHaveLength(1);
+      expect(mock.requestLog.some((e) => e.path.endsWith("/repository/commits"))).toBe(false);
+    });
+
+    it("getCommitsBetween：仅请求 compare，不访问 repository/commits", async () => {
+      const baseSha = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+      const headSha = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+      registerCompareResponse(mock.scenario, "p/sha", baseSha, headSha, compareCommitsBetween);
+      const adapter = new GitlabAdapter({ type: "gitlab", base: mock.baseUrl, token: tok });
+      mock.clearLog();
+      await adapter.getCommitsBetween("p/sha", baseSha, headSha);
+      expect(mock.requestLog.filter((e) => e.path.endsWith("/repository/compare"))).toHaveLength(1);
+      expect(mock.requestLog.some((e) => e.path.endsWith("/repository/commits"))).toBe(false);
     });
   });
 });

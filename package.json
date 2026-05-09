@@ -1,6 +1,6 @@
 {
   "name": "@canyonjs/git-provider",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "GitLab provider client with adapter architecture.",
   "keywords": [
     "api",

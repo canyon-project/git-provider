@@ -47,6 +47,10 @@ export class GithubAdapter implements ScmAdapter {
     };
   }
 
+  async getCommitsBetween(_repoID: string, _base: string, _head: string): Promise<string[]> {
+    throw new Error("GitHubAdapter.getCommitsBetween 尚未实现");
+  }
+
   async getCompare(_repoID: string, _base: string, _head: string): Promise<Compare> {
     throw new Error("GitHubAdapter.getCompare 尚未实现");
   }
