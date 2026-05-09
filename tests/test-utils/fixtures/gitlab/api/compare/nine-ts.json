@@ -1,0 +1,63 @@
+{
+  "commits": [
+    {
+      "id": "big"
+    }
+  ],
+  "diffs": [
+    {
+      "old_path": "f1.ts",
+      "new_path": "f1.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f2.ts",
+      "new_path": "f2.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f3.ts",
+      "new_path": "f3.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f4.ts",
+      "new_path": "f4.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f5.ts",
+      "new_path": "f5.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f6.ts",
+      "new_path": "f6.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f7.ts",
+      "new_path": "f7.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f8.ts",
+      "new_path": "f8.ts",
+      "new_file": false,
+      "deleted_file": false
+    },
+    {
+      "old_path": "f9.ts",
+      "new_path": "f9.ts",
+      "new_file": false,
+      "deleted_file": false
+    }
+  ]
+}

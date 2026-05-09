@@ -70,7 +70,7 @@ GitHub 仅 token、`base` 固定为 `https://api.github.com`。
 | `pnpm run test`      | Vitest                                                    |
 | `pnpm run debug`     | 本地脚本 `scripts/debug/`（`.env` 配置 token、仓库与 ref） |
 
-目录概览：**`src/adapter.ts`** 定义 **`ScmAdapter`**；**`src/gitlab.ts`** / **`src/github.ts`** 为实现；**`src/diff-line.ts`** 为行号计算与扩展名判定；**`src/types.ts`** 为配置与各数据结构类型。
+目录概览：**`src/adapter.ts`** 定义 **`ScmAdapter`**；**`src/gitlab.ts`** / **`src/github.ts`** 为实现；**`src/diff-line.ts`** 为行号计算与扩展名判定；**`src/types.ts`** 为配置与各数据结构类型。**`tests/`** 为 Vitest 测试；**`tests/test-utils/`** 为本机 HTTP mock、fixture JSON 等（不进入 `dist`）。
 
 ## 许可证
 

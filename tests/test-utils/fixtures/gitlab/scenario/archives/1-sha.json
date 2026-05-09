@@ -1,0 +1,9 @@
+{
+  "repoId": "1",
+  "sha": "sha",
+  "rootFolder": "repo-export-123",
+  "files": {
+    "README.md": "hi",
+    "src/x.ts": "xx"
+  }
+}

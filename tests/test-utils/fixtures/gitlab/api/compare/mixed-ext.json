@@ -1,0 +1,13 @@
+{
+  "commits": [{ "id": "only-one" }],
+  "diffs": [
+    {
+      "old_path": "src/foo.ts",
+      "new_path": "src/foo.ts"
+    },
+    {
+      "old_path": "README.md",
+      "new_path": "README.md"
+    }
+  ]
+}

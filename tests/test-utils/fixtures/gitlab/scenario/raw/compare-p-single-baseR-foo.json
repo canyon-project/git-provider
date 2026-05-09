@@ -1,0 +1,6 @@
+{
+  "repoId": "p/single",
+  "ref": "baseR",
+  "path": "src/foo.ts",
+  "body": "hello:\n"
+}

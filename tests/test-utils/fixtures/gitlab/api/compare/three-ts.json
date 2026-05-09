@@ -1,0 +1,8 @@
+{
+  "commits": [],
+  "diffs": [
+    { "old_path": "a.ts", "new_path": "a.ts" },
+    { "old_path": "b.ts", "new_path": "b.ts" },
+    { "old_path": "c.ts", "new_path": "c.ts" }
+  ]
+}

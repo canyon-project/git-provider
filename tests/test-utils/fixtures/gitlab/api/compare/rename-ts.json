@@ -1,0 +1,11 @@
+{
+  "commits": [{ "id": "ren" }],
+  "diffs": [
+    {
+      "old_path": "legacy/old.ts",
+      "new_path": "src/new.ts",
+      "new_file": false,
+      "deleted_file": false
+    }
+  ]
+}

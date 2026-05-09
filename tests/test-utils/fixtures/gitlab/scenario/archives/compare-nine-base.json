@@ -1,0 +1,16 @@
+{
+  "repoId": "p/nine",
+  "sha": "baseNine",
+  "rootFolder": "repo-export-123",
+  "files": {
+    "f1.ts": "b1\n",
+    "f2.ts": "b2\n",
+    "f3.ts": "b3\n",
+    "f4.ts": "b4\n",
+    "f5.ts": "b5\n",
+    "f6.ts": "b6\n",
+    "f7.ts": "b7\n",
+    "f8.ts": "b8\n",
+    "f9.ts": "b9\n"
+  }
+}

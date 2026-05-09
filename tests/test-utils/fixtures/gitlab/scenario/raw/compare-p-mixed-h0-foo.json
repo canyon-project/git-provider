@@ -1,0 +1,6 @@
+{
+  "repoId": "p/mixed",
+  "ref": "h0",
+  "path": "src/foo.ts",
+  "body": "x\ny\n"
+}

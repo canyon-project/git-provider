@@ -1,0 +1,11 @@
+{
+  "commits": [{ "id": "commit-a" }, { "id": "commit-b" }],
+  "diffs": [
+    {
+      "old_path": "src/foo.ts",
+      "new_path": "src/foo.ts",
+      "new_file": false,
+      "deleted_file": false
+    }
+  ]
+}

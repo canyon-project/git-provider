@@ -1,0 +1,16 @@
+{
+  "repoId": "ns/proj",
+  "sha": "deadbeef",
+  "rootFolder": "repo-export-123",
+  "files": {
+    "f1.ts": "c1",
+    "f2.ts": "c2",
+    "f3.ts": "c3",
+    "f4.ts": "c4",
+    "f5.ts": "c5",
+    "f6.ts": "c6",
+    "f7.ts": "c7",
+    "f8.ts": "c8",
+    "f9.ts": "c9"
+  }
+}

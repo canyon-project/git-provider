@@ -74,9 +74,12 @@ export class GitlabAdapter implements ScmAdapter {
       .filter((entry): entry is NonNullable<typeof entry> => entry != null)
       .filter((entry) => pathMatchesLineDiffExtensions(entry.keyPath));
 
-    // 4. 白名单筛后文件数超过上限则整块不拉正文、不算行号；否则用 getSourceFiles 批量取 base/head（路径多时走 archive.zip，少时并发 raw），再按 diff 库算行号
+    // 4. 无白名单文件、或文件数超过上限：不拉正文；否则用 getSourceFiles 批量取 base/head（路径多时走 archive.zip，少时并发 raw），再按 diff 库算行号
     let lineBuckets: Map<string, LineBuckets>;
-    if (comparedPaths.length > LINE_DIFF_MAX_FILTERED_FILES) {
+    if (
+      comparedPaths.length === 0 ||
+      comparedPaths.length > LINE_DIFF_MAX_FILTERED_FILES
+    ) {
       lineBuckets = new Map<string, LineBuckets>();
     } else {
       const basePaths = [...new Set(comparedPaths.map((p) => p.pathAtBase))];
