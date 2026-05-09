@@ -75,10 +75,7 @@ export class GitlabAdapter implements ScmAdapter {
 
     // 4. 无白名单文件、或文件数超过上限：不拉正文；否则用 getSourceFiles 批量取 base/head（路径多时走 archive.zip，少时并发 raw），再按 diff 库算行号
     let lineBuckets: Map<string, LineBuckets>;
-    if (
-      comparedPaths.length === 0 ||
-      comparedPaths.length > LINE_DIFF_MAX_FILTERED_FILES
-    ) {
+    if (comparedPaths.length === 0 || comparedPaths.length > LINE_DIFF_MAX_FILTERED_FILES) {
       lineBuckets = new Map<string, LineBuckets>();
     } else {
       const basePaths = [...new Set(comparedPaths.map((p) => p.pathAtBase))];
@@ -89,7 +86,11 @@ export class GitlabAdapter implements ScmAdapter {
       ]);
       lineBuckets = await computeLineBucketsByRef(comparedPaths, base, head, (path, ref) =>
         Promise.resolve(
-          ref === base ? (baseTexts.get(path) ?? "") : ref === head ? (headTexts.get(path) ?? "") : "",
+          ref === base
+            ? (baseTexts.get(path) ?? "")
+            : ref === head
+              ? (headTexts.get(path) ?? "")
+              : "",
         ),
       );
     }

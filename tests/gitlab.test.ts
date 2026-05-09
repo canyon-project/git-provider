@@ -253,9 +253,9 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
       const adapter = new GitlabAdapter({ type: "gitlab", base: mock.baseUrl, token: tok });
       const cmp = await adapter.getCompare("p/nine", "baseNine", "headNine");
 
-      expect(mock.requestLog.filter((e) => e.path.endsWith("/repository/archive.zip"))).toHaveLength(
-        2,
-      );
+      expect(
+        mock.requestLog.filter((e) => e.path.endsWith("/repository/archive.zip")),
+      ).toHaveLength(2);
       expect(cmp.changedFiles).toHaveLength(9);
       const f1 = cmp.changedFiles.find((c) => c.path === "f1.ts");
       expect(f1?.additions.length).toBeGreaterThan(0);

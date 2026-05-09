@@ -72,7 +72,7 @@ export type GitlabMockServer = {
 function readToken(req: IncomingMessage): string | null {
   const h = req.headers["private-token"];
   if (h == null) return null;
-  return Array.isArray(h) ? h[0] ?? null : h;
+  return Array.isArray(h) ? (h[0] ?? null) : h;
 }
 
 /**
@@ -121,8 +121,9 @@ export async function startGitlabMockServer(): Promise<GitlabMockServer> {
         return;
       }
 
-      const rawFile =
-        /^\/api\/v4\/projects\/([^/]+)\/repository\/files\/([^/]+)\/raw$/.exec(url.pathname);
+      const rawFile = /^\/api\/v4\/projects\/([^/]+)\/repository\/files\/([^/]+)\/raw$/.exec(
+        url.pathname,
+      );
       if (rawFile) {
         const repoSeg = rawFile[1] as string;
         const fileSeg = rawFile[2] as string;
@@ -151,8 +152,7 @@ export async function startGitlabMockServer(): Promise<GitlabMockServer> {
         return;
       }
 
-      const archive =
-        /^\/api\/v4\/projects\/([^/]+)\/repository\/archive\.zip$/.exec(url.pathname);
+      const archive = /^\/api\/v4\/projects\/([^/]+)\/repository\/archive\.zip$/.exec(url.pathname);
       if (archive) {
         const repoSeg = archive[1] as string;
         const repoId = decodeURIComponent(repoSeg);
@@ -170,8 +170,7 @@ export async function startGitlabMockServer(): Promise<GitlabMockServer> {
         return;
       }
 
-      const compareMatch =
-        /^\/api\/v4\/projects\/([^/]+)\/repository\/compare$/.exec(url.pathname);
+      const compareMatch = /^\/api\/v4\/projects\/([^/]+)\/repository\/compare$/.exec(url.pathname);
       if (compareMatch) {
         const repoSeg = compareMatch[1] as string;
         const repoId = decodeURIComponent(repoSeg);

@@ -51,7 +51,11 @@ export class GithubAdapter implements ScmAdapter {
     throw new Error("GitHubAdapter.getCompare 尚未实现");
   }
 
-  async getSourceFiles(repoID:string, sha:string, filePaths:string[]):Promise<Map<string, string>>{
+  async getSourceFiles(
+    repoID: string,
+    sha: string,
+    filePaths: string[],
+  ): Promise<Map<string, string>> {
     throw new Error("GitHubAdapter.getSourceFiles 尚未实现");
   }
 }

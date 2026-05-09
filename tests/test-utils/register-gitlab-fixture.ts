@@ -47,7 +47,10 @@ export type ArchiveScenarioFixture = {
   files: Record<string, string>;
 };
 
-export function registerArchiveScenario(scenario: GitlabMockScenario, f: ArchiveScenarioFixture): void {
+export function registerArchiveScenario(
+  scenario: GitlabMockScenario,
+  f: ArchiveScenarioFixture,
+): void {
   const root = f.rootFolder ?? "repo-export-123";
   const zip = new AdmZip();
   for (const [rel, text] of Object.entries(f.files)) {

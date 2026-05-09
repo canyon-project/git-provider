@@ -45,9 +45,9 @@ describe("GitlabAdapter.getCompare（LINE_DIFF_MAX_* 缩小）", () => {
     const cmp = await adapter.getCompare("p/t3", "xb", "xh");
 
     expect(cmp.changedFiles).toHaveLength(3);
-    expect(cmp.changedFiles.every((c) => c.additions.length === 0 && c.deletions.length === 0)).toBe(
-      true,
-    );
+    expect(
+      cmp.changedFiles.every((c) => c.additions.length === 0 && c.deletions.length === 0),
+    ).toBe(true);
     expect(mock.requestLog.some((e) => e.path.includes("/repository/files/"))).toBe(false);
     expect(mock.requestLog.some((e) => e.path.endsWith("/repository/archive.zip"))).toBe(false);
   });
@@ -63,8 +63,8 @@ describe("GitlabAdapter.getCompare（LINE_DIFF_MAX_* 缩小）", () => {
     expect(cmp.changedFiles).toHaveLength(1);
     expect(cmp.changedFiles[0]?.additions).toEqual([]);
     expect(cmp.changedFiles[0]?.deletions).toEqual([]);
-    expect(mock.requestLog.filter((e) => e.path.includes("/repository/files/")).length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      mock.requestLog.filter((e) => e.path.includes("/repository/files/")).length,
+    ).toBeGreaterThan(0);
   });
 });
