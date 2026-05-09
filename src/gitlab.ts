@@ -1,5 +1,4 @@
 import type { ScmAdapter } from "./adapter.ts";
-import axios from 'axios'
 import {
   comparedRefsFromGitlabDiff,
   computeLineBucketsByRef,
@@ -141,18 +140,24 @@ export class GitlabAdapter implements ScmAdapter {
 
     const pid = encodeURIComponent(repoID);
     const archiveUrl = `${this.base}/projects/${pid}/repository/archive.zip`;
-    const resp = await axios.get(archiveUrl, {
+    const { data } = await get(archiveUrl, {
       headers: this.headers(),
       params: { sha },
       responseType: "arraybuffer",
-      timeout: 60000,
+      timeout: 60_000,
     });
     const { default: AdmZip } = await import("adm-zip");
     const { tmpNameSync } = await import("tmp");
     const fs = await import("node:fs");
     const tempZip = tmpNameSync({ postfix: ".zip" });
     try {
-      fs.writeFileSync(tempZip, resp.data);
+      const bin = data as ArrayBuffer | Uint8Array;
+      const buf = Buffer.isBuffer(bin)
+        ? bin
+        : bin instanceof ArrayBuffer
+          ? Buffer.from(bin)
+          : Buffer.from(bin);
+      fs.writeFileSync(tempZip, buf);
       const zip = new AdmZip(tempZip);
       const entries = zip.getEntries();
       const targetSet = wantAllFiles ? null : new Set(uniquePaths);

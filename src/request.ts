@@ -1,14 +1,9 @@
-/** 默认请求超时（毫秒），与常见 axios 配置一致 */
+import axios, { type AxiosRequestConfig } from "axios";
+
 export const DEFAULT_TIMEOUT_MS = 10_000;
 
-export type HttpRequestConfig = {
-  /** 请求头 */
-  headers?: HeadersInit;
-  /** 超时毫秒数，缺省为 `DEFAULT_TIMEOUT_MS` */
-  timeout?: number;
-  /** 与内部超时合并；任一方 abort 都会中断请求（需运行环境支持 `AbortSignal.any`） */
-  signal?: AbortSignal;
-};
+/** 统一超时；需要改签名单独在调用里传 `AxiosRequestConfig` */
+export const http = axios.create({ timeout: DEFAULT_TIMEOUT_MS });
 
 export type HttpResponse<T = unknown> = {
   data: T;
@@ -38,94 +33,37 @@ export class HttpError extends Error {
   }
 }
 
-function mergeSignal(timeoutSignal: AbortSignal, userSignal?: AbortSignal): AbortSignal {
-  if (!userSignal) return timeoutSignal;
-  const any = (
-    AbortSignal as typeof AbortSignal & { any?: (signals: AbortSignal[]) => AbortSignal }
-  ).any;
-  if (typeof any === "function") {
-    return any([userSignal, timeoutSignal]);
+function rethrowAsHttpError(e: unknown): never {
+  if (axios.isAxiosError(e) && e.response) {
+    throw new HttpError(e.response.status, e.response.statusText ?? "", e.response.data);
   }
-  return timeoutSignal;
+  if (e instanceof Error) throw e;
+  throw new Error(String(e));
 }
 
-async function parseBody(res: Response): Promise<unknown> {
-  const text = await res.text();
-  if (!text) return undefined;
-  const ct = res.headers.get("content-type") ?? "";
-  if (ct.includes("application/json")) {
-    try {
-      return JSON.parse(text) as unknown;
-    } catch {
-      return text;
-    }
-  }
-  return text;
-}
-
-type DispatchConfig = HttpRequestConfig & {
-  method?: string;
-  body?: BodyInit | null;
-};
-
-async function dispatch<T>(url: string | URL, config: DispatchConfig): Promise<HttpResponse<T>> {
-  const timeoutMs = config.timeout ?? DEFAULT_TIMEOUT_MS;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  const signal = mergeSignal(controller.signal, config.signal);
-
+export async function get<T = unknown>(
+  url: string,
+  config?: AxiosRequestConfig,
+): Promise<HttpResponse<T>> {
   try {
-    const res = await fetch(url, {
-      method: config.method ?? "GET",
-      headers: config.headers,
-      body: config.body,
-      signal,
-    });
-    const data = await parseBody(res);
-    if (!res.ok) {
-      throw new HttpError(res.status, res.statusText, data);
-    }
-    return {
-      data: data as T,
-      status: res.status,
-      statusText: res.statusText,
-    };
-  } finally {
-    clearTimeout(timeoutId);
+    const r = await http.get<T>(url, config);
+    return { data: r.data, status: r.status, statusText: r.statusText };
+  } catch (e) {
+    rethrowAsHttpError(e);
   }
 }
 
-/** 类似 `axios.get`：返回 `{ data, status, statusText }`，非 2xx 抛 `HttpError` */
-export function get<T = unknown>(
-  url: string | URL,
-  config: HttpRequestConfig = {},
-): Promise<HttpResponse<T>> {
-  return dispatch<T>(url, { ...config, method: "GET" });
-}
-
-/** `axios.post` 常见 JSON 用法：`body` 会被 `JSON.stringify`，并带上 `Content-Type: application/json` */
-export function post<T = unknown>(
-  url: string | URL,
+export async function post<T = unknown>(
+  url: string,
   body?: unknown,
-  config: HttpRequestConfig = {},
+  config?: AxiosRequestConfig,
 ): Promise<HttpResponse<T>> {
-  const headers = new Headers(config.headers as HeadersInit | undefined);
-  if (body !== undefined && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
+  try {
+    const r = await http.post<T>(url, body, config);
+    return { data: r.data, status: r.status, statusText: r.statusText };
+  } catch (e) {
+    rethrowAsHttpError(e);
   }
-  return dispatch<T>(url, {
-    ...config,
-    method: "POST",
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
 }
 
-/** 与 axios 默认导出类似的单对象入口（按需扩展 `put` / `delete` 等） */
-const request = {
-  defaults: { timeout: DEFAULT_TIMEOUT_MS },
-  get,
-  post,
-};
-
-export default request;
+export default { http, get, post, defaults: http.defaults };
