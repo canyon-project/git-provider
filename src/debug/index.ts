@@ -16,8 +16,8 @@ async function main() {
     token: config.token,
   });
 
-  await runRepoInfoDebug(adapter, config, outDir);
-  await runCompareDebug(adapter, config, outDir);
+  // await runRepoInfoDebug(adapter, config, outDir);
+  // await runCompareDebug(adapter, config, outDir);
   await runSourceFilesDebug(adapter, config);
 }
 

@@ -74,13 +74,23 @@ export class GitlabAdapter implements ScmAdapter {
       .filter((entry): entry is NonNullable<typeof entry> => entry != null)
       .filter((entry) => pathMatchesLineDiffExtensions(entry.keyPath));
 
-    // 4. 白名单筛后文件数超过上限则整块不拉 raw、不算行号；否则在 base/head 上拉 raw，按 diff 库算行号（单文件任一侧超过行数上限则该文件行号为空）
-    const lineBuckets =
-      comparedPaths.length > LINE_DIFF_MAX_FILTERED_FILES
-        ? new Map<string, LineBuckets>()
-        : await computeLineBucketsByRef(comparedPaths, base, head, (path, ref) =>
-            this.getRawFileText(repoID, path, ref),
-          );
+    // 4. 白名单筛后文件数超过上限则整块不拉正文、不算行号；否则用 getSourceFiles 批量取 base/head（路径多时走 archive.zip，少时并发 raw），再按 diff 库算行号
+    let lineBuckets: Map<string, LineBuckets>;
+    if (comparedPaths.length > LINE_DIFF_MAX_FILTERED_FILES) {
+      lineBuckets = new Map<string, LineBuckets>();
+    } else {
+      const basePaths = [...new Set(comparedPaths.map((p) => p.pathAtBase))];
+      const headPaths = [...new Set(comparedPaths.map((p) => p.pathAtHead))];
+      const [baseTexts, headTexts] = await Promise.all([
+        this.getSourceFiles(repoID, base, basePaths),
+        this.getSourceFiles(repoID, head, headPaths),
+      ]);
+      lineBuckets = await computeLineBucketsByRef(comparedPaths, base, head, (path, ref) =>
+        Promise.resolve(
+          ref === base ? (baseTexts.get(path) ?? "") : ref === head ? (headTexts.get(path) ?? "") : "",
+        ),
+      );
+    }
 
     // 5. 仍遍历全部 diff 行以拿到 path，但只保留白名单扩展名；与第 4 步 Map 对齐得到 additions/deletions（未参与拉取的文件不会进列表）
     const changedFiles: CompareDiffItem[] = diffRows
