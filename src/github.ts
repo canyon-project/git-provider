@@ -1,6 +1,6 @@
 import type { ScmAdapter } from "./adapter.ts";
 import { get } from "./request";
-import type { Compare, GithubScmConfig, RepoInfo } from "./types.ts";
+import type { CommitSummary, Compare, GithubScmConfig, RepoInfo } from "./types.ts";
 
 const GITHUB_BASE = "https://api.github.com";
 
@@ -49,6 +49,10 @@ export class GithubAdapter implements ScmAdapter {
 
   async getCommitsBetween(_repoID: string, _base: string, _head: string): Promise<string[]> {
     throw new Error("GitHubAdapter.getCommitsBetween 尚未实现");
+  }
+
+  async getCommit(repoID: string, ref: string): Promise<CommitSummary> {
+    throw new Error("GitHubAdapter.getCommit 尚未实现");
   }
 
   async getCompare(_repoID: string, _base: string, _head: string): Promise<Compare> {

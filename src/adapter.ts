@@ -1,4 +1,4 @@
-import type { RepoInfo, Compare } from "./types.ts";
+import type { CommitSummary, RepoInfo, Compare } from "./types.ts";
 
 /**
  * SCM 适配器接口：业务层只依赖此接口，通过 createScmAdapter 获取具体实现。
@@ -9,6 +9,12 @@ export interface ScmAdapter {
 
   /** 获取 base..head 之间 commit sha 列表（顺序与 GitLab `repository/compare` 返回的 `commits` 一致；无 `commits` 时可能仅有 `commit.id`） */
   getCommitsBetween(repoID: string, base: string, head: string): Promise<string[]>;
+
+  /**
+   * 获取指定 ref（分支名、tag 等）当前 tip 的最新一条提交
+   * @param ref 分支名或与 GitLab `ref_name` / GitHub `sha` 查询参数兼容的引用
+   */
+  getCommit(repoID: string, ref: string): Promise<CommitSummary>;
 
   /** 获取 base...head 之间变更 */
   getCompare(repoID: string, base: string, head: string): Promise<Compare>;

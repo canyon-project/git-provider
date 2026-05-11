@@ -23,3 +23,13 @@ export interface Compare {
   commitList: string[];
   changedFiles: CompareDiffItem[];
 }
+
+/** 某 ref（通常为主干/当前分支名）tip 处的最近一次提交摘要 */
+export interface CommitSummary {
+  sha: string;
+  title: string;
+  authorName: string;
+  authorEmail: string;
+  /** ISO 8601，取平台提交时间字段（优先提交时间） */
+  createdAt: string;
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "title": "feat: 当前分支最新提交",
+    "author_name": "张三",
+    "author_email": "zhang@example.com",
+    "committed_date": "2026-05-10T08:30:00.000Z"
+  }
+]

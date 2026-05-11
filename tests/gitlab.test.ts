@@ -4,6 +4,7 @@ import { GitlabAdapter } from "../src/gitlab";
 import errCompareNotFound from "./test-utils/fixtures/gitlab/api/errors/compare-not-found.json";
 import errNotFoundProject from "./test-utils/fixtures/gitlab/api/errors/not-found-project.json";
 import compareCommitsBetween from "./test-utils/fixtures/gitlab/api/compare/commits-between.json";
+import commitMainTip from "./test-utils/fixtures/gitlab/api/commits/main-tip.json";
 import compareEmpty from "./test-utils/fixtures/gitlab/api/compare/empty.json";
 import compareMixed from "./test-utils/fixtures/gitlab/api/compare/mixed-ext.json";
 import compareNineTs from "./test-utils/fixtures/gitlab/api/compare/nine-ts.json";
@@ -31,6 +32,7 @@ import {
 } from "./test-utils/mock-gitlab-http-server";
 import {
   registerArchiveScenario,
+  registerCommitListResponse,
   registerCompareResponse,
   registerProjectResponse,
   registerRawScenario,
@@ -104,6 +106,37 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
         name: "HttpError",
         status: 404,
         data: errNotFoundProject,
+      });
+    });
+  });
+
+  describe("getCommit", () => {
+    it("ref 为分支名时请求 repository/commits 并映射为 CommitSummary", async () => {
+      registerCommitListResponse(mock.scenario, "group/sub/project", "main", commitMainTip);
+
+      const adapter = new GitlabAdapter({
+        type: "gitlab",
+        base: mock.baseUrl,
+        token: "test-token",
+      });
+
+      const c = await adapter.getCommit("group/sub/project", "main");
+
+      expect(mock.requestLog).toEqual([
+        expect.objectContaining({
+          method: "GET",
+          path: "/api/v4/projects/group%2Fsub%2Fproject/repository/commits",
+          token: "test-token",
+        }),
+      ]);
+      expect(mock.requestLog[0]?.search).toContain("ref_name=main");
+      expect(mock.requestLog[0]?.search).toContain("per_page=1");
+      expect(c).toEqual({
+        sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        title: "feat: 当前分支最新提交",
+        authorName: "张三",
+        authorEmail: "zhang@example.com",
+        createdAt: "2026-05-10T08:30:00.000Z",
       });
     });
   });

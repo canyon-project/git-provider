@@ -7,7 +7,13 @@ import {
   type LineBuckets,
 } from "./diff-line";
 import { get } from "./request";
-import type { Compare, CompareDiffItem, GitlabScmConfig, RepoInfo } from "./types.ts";
+import type {
+  CommitSummary,
+  Compare,
+  CompareDiffItem,
+  GitlabScmConfig,
+  RepoInfo,
+} from "./types.ts";
 
 /** 唯一路径数超过该值时用 archive.zip；否则并发请求单文件 raw，避免为少量路径拉整仓 */
 const SOURCE_FILES_ARCHIVE_THRESHOLD = 8;
@@ -30,6 +36,25 @@ function commitIdsFromCompare(data: CompareApiPayload): string[] {
   if (ids.length > 0) return ids;
   const tip = data.commit?.id;
   return tip != null && tip !== "" ? [tip] : [];
+}
+
+type GitlabCommitApiRow = {
+  id: string;
+  title?: string;
+  message?: string;
+  author_name?: string;
+  author_email?: string;
+  committed_date?: string;
+  authored_date?: string;
+  created_at?: string;
+};
+
+function commitTitleFromGitlabRow(row: GitlabCommitApiRow): string {
+  const t = row.title?.trim();
+  if (t) return t;
+  const msg = row.message?.trim() ?? "";
+  const lineBreak = msg.indexOf("\n");
+  return (lineBreak === -1 ? msg : msg.slice(0, lineBreak)).trim();
 }
 
 export class GitlabAdapter implements ScmAdapter {
@@ -80,6 +105,26 @@ export class GitlabAdapter implements ScmAdapter {
   async getCommitsBetween(repoID: string, base: string, head: string): Promise<string[]> {
     const data = await this.fetchComparePayload(repoID, base, head);
     return commitIdsFromCompare(data);
+  }
+
+  async getCommit(repoID: string, ref: string): Promise<CommitSummary> {
+    const url = `${this.base}/projects/${encodeURIComponent(repoID)}/repository/commits`;
+    const { data } = await get<GitlabCommitApiRow[]>(url, {
+      headers: this.headers(),
+      params: { ref_name: ref, per_page: 1 },
+    });
+    const row = Array.isArray(data) ? data[0] : undefined;
+    if (row == null || row.id === "") {
+      throw new Error("GitLab repository/commits 未返回提交");
+    }
+    const createdAt = row.committed_date ?? row.authored_date ?? row.created_at ?? "";
+    return {
+      sha: row.id,
+      title: commitTitleFromGitlabRow(row),
+      authorName: row.author_name ?? "",
+      authorEmail: row.author_email ?? "",
+      createdAt,
+    };
   }
 
   async getCompare(repoID: string, base: string, head: string): Promise<Compare> {
