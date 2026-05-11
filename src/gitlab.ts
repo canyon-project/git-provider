@@ -107,15 +107,14 @@ export class GitlabAdapter implements ScmAdapter {
     return commitIdsFromCompare(data);
   }
 
-  async getCommit(repoID: string, ref: string): Promise<CommitSummary> {
-    const url = `${this.base}/projects/${encodeURIComponent(repoID)}/repository/commits`;
-    const { data } = await get<GitlabCommitApiRow[]>(url, {
+  async getCommit(repoID: string, sha: string): Promise<CommitSummary> {
+    const url = `${this.base}/projects/${encodeURIComponent(repoID)}/repository/commits/${encodeURIComponent(sha)}`;
+    const { data } = await get<GitlabCommitApiRow>(url, {
       headers: this.headers(),
-      params: { ref_name: ref, per_page: 1 },
     });
-    const row = Array.isArray(data) ? data[0] : undefined;
-    if (row == null || row.id === "") {
-      throw new Error("GitLab repository/commits 未返回提交");
+    const row = data;
+    if (row == null || typeof row !== "object" || row.id === "") {
+      throw new Error("GitLab repository/commits/:sha 未返回提交");
     }
     const createdAt = row.committed_date ?? row.authored_date ?? row.created_at ?? "";
     return {

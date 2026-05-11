@@ -24,7 +24,7 @@ export interface Compare {
   changedFiles: CompareDiffItem[];
 }
 
-/** 某 ref（通常为主干/当前分支名）tip 处的最近一次提交摘要 */
+/** 单个提交的摘要（如 `repository/commits/:sha`） */
 export interface CommitSummary {
   sha: string;
   title: string;

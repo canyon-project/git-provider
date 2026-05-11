@@ -26,8 +26,8 @@ export type GitlabMockScenario = {
   archives: Map<string, Buffer>;
   /** key: `${repoId}\n${from}\n${to}` → GitLab compare API 200 JSON */
   compareResponses: Map<string, unknown>;
-  /** key: `${repoId}\n${refName}` → `GET .../repository/commits` 200 JSON 数组（refName 为 query `ref_name`，缺省为 ""） */
-  commitLists: Map<string, unknown>;
+  /** key: `${repoId}\n${commitRef}` → `GET .../repository/commits/:sha` 200 JSON 单对象（path 段经 decodeURIComponent 后的 sha/分支/tag） */
+  commits: Map<string, unknown>;
 };
 
 export function createEmptyScenario(): GitlabMockScenario {
@@ -38,7 +38,7 @@ export function createEmptyScenario(): GitlabMockScenario {
     rawBody: new Map(),
     archives: new Map(),
     compareResponses: new Map(),
-    commitLists: new Map(),
+    commits: new Map(),
   };
 }
 
@@ -49,7 +49,7 @@ export function resetScenario(scenario: GitlabMockScenario): void {
   scenario.rawBody.clear();
   scenario.archives.clear();
   scenario.compareResponses.clear();
-  scenario.commitLists.clear();
+  scenario.commits.clear();
 }
 
 export function rawMapKey(repoId: string, ref: string, filePath: string): string {
@@ -64,8 +64,8 @@ export function compareMapKey(repoId: string, from: string, to: string): string 
   return `${repoId}\n${from}\n${to}`;
 }
 
-export function commitListMapKey(repoId: string, refName: string): string {
-  return `${repoId}\n${refName}`;
+export function commitMapKey(repoId: string, commitRef: string): string {
+  return `${repoId}\n${commitRef}`;
 }
 
 export type GitlabMockServer = {
@@ -193,12 +193,14 @@ export async function startGitlabMockServer(): Promise<GitlabMockServer> {
         return;
       }
 
-      const commitsMatch = /^\/api\/v4\/projects\/([^/]+)\/repository\/commits$/.exec(url.pathname);
-      if (commitsMatch) {
-        const repoSeg = commitsMatch[1] as string;
+      const commitMatch =
+        /^\/api\/v4\/projects\/([^/]+)\/repository\/commits\/([^/]+)$/.exec(url.pathname);
+      if (commitMatch) {
+        const repoSeg = commitMatch[1] as string;
+        const shaSeg = commitMatch[2] as string;
         const repoId = decodeURIComponent(repoSeg);
-        const refName = url.searchParams.get("ref_name") ?? "";
-        const payload = scenario.commitLists.get(commitListMapKey(repoId, refName));
+        const commitRef = decodeURIComponent(shaSeg);
+        const payload = scenario.commits.get(commitMapKey(repoId, commitRef));
         if (payload === undefined) {
           sendJson(404, errNoRoute);
           return;

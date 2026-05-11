@@ -2,7 +2,7 @@ import AdmZip from "adm-zip";
 import type { GitlabMockScenario } from "./mock-gitlab-http-server";
 import {
   archiveMapKey,
-  commitListMapKey,
+  commitMapKey,
   compareMapKey,
   rawMapKey,
 } from "./mock-gitlab-http-server";
@@ -75,12 +75,12 @@ export function registerCompareResponse(
   scenario.compareResponses.set(compareMapKey(repoId, from, to), body);
 }
 
-/** 注册 `GET /projects/:id/repository/commits?ref_name=` 的 200 JSON（与 GitLab 列表接口一致，一般为数组） */
-export function registerCommitListResponse(
+/** 注册 `GET /projects/:id/repository/commits/:sha` 的 200 JSON（与 GitLab 单提交接口一致，为单对象） */
+export function registerCommitResponse(
   scenario: GitlabMockScenario,
   repoId: string,
-  refName: string,
+  sha: string,
   body: unknown,
 ): void {
-  scenario.commitLists.set(commitListMapKey(repoId, refName), body);
+  scenario.commits.set(commitMapKey(repoId, sha), body);
 }

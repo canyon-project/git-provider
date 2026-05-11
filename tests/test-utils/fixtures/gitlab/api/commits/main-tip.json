@@ -1,9 +1,7 @@
-[
-  {
-    "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "title": "feat: 当前分支最新提交",
-    "author_name": "张三",
-    "author_email": "zhang@example.com",
-    "committed_date": "2026-05-10T08:30:00.000Z"
-  }
-]
+{
+  "id": "94d4429f5019c5b9f4f555c59236462ad6836f2f",
+  "title": "feat: 单提交接口",
+  "author_name": "张三",
+  "author_email": "zhang@example.com",
+  "committed_date": "2026-05-10T08:30:00.000Z"
+}

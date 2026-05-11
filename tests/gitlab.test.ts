@@ -32,7 +32,7 @@ import {
 } from "./test-utils/mock-gitlab-http-server";
 import {
   registerArchiveScenario,
-  registerCommitListResponse,
+  registerCommitResponse,
   registerCompareResponse,
   registerProjectResponse,
   registerRawScenario,
@@ -111,8 +111,9 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
   });
 
   describe("getCommit", () => {
-    it("ref 为分支名时请求 repository/commits 并映射为 CommitSummary", async () => {
-      registerCommitListResponse(mock.scenario, "group/sub/project", "main", commitMainTip);
+    it("请求 GET .../repository/commits/:sha 并映射为 CommitSummary", async () => {
+      const sha = "94d4429f5019c5b9f4f555c59236462ad6836f2f";
+      registerCommitResponse(mock.scenario, "143323", sha, commitMainTip);
 
       const adapter = new GitlabAdapter({
         type: "gitlab",
@@ -120,20 +121,18 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
         token: "test-token",
       });
 
-      const c = await adapter.getCommit("group/sub/project", "main");
+      const c = await adapter.getCommit("143323", sha);
 
       expect(mock.requestLog).toEqual([
         expect.objectContaining({
           method: "GET",
-          path: "/api/v4/projects/group%2Fsub%2Fproject/repository/commits",
+          path: `/api/v4/projects/143323/repository/commits/${sha}`,
           token: "test-token",
         }),
       ]);
-      expect(mock.requestLog[0]?.search).toContain("ref_name=main");
-      expect(mock.requestLog[0]?.search).toContain("per_page=1");
       expect(c).toEqual({
-        sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        title: "feat: 当前分支最新提交",
+        sha: "94d4429f5019c5b9f4f555c59236462ad6836f2f",
+        title: "feat: 单提交接口",
         authorName: "张三",
         authorEmail: "zhang@example.com",
         createdAt: "2026-05-10T08:30:00.000Z",

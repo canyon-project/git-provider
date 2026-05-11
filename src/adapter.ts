@@ -11,10 +11,9 @@ export interface ScmAdapter {
   getCommitsBetween(repoID: string, base: string, head: string): Promise<string[]>;
 
   /**
-   * 获取指定 ref（分支名、tag 等）当前 tip 的最新一条提交
-   * @param ref 分支名或与 GitLab `ref_name` / GitHub `sha` 查询参数兼容的引用
+   * 获取单个提交（GitLab：`GET .../repository/commits/:sha`，路径参数可为完整/短 SHA、分支名或 tag）
    */
-  getCommit(repoID: string, ref: string): Promise<CommitSummary>;
+  getCommit(repoID: string, sha: string): Promise<CommitSummary>;
 
   /** 获取 base...head 之间变更 */
   getCompare(repoID: string, base: string, head: string): Promise<Compare>;

@@ -51,7 +51,7 @@ export class GithubAdapter implements ScmAdapter {
     throw new Error("GitHubAdapter.getCommitsBetween 尚未实现");
   }
 
-  async getCommit(repoID: string, ref: string): Promise<CommitSummary> {
+  async getCommit(_repoID: string, _sha: string): Promise<CommitSummary> {
     throw new Error("GitHubAdapter.getCommit 尚未实现");
   }
 
