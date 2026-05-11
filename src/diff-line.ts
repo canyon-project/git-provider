@@ -31,10 +31,21 @@ export type LineBuckets = {
   deletions: number[];
 };
 
+/** 任一路径段名含典型测试目录片段则不做逐行 diff（如 `src/__tests__/x.ts`、`__test__/foo.ts`）。 */
+function pathTouchesTestSegmentMarker(filePath: string): boolean {
+  for (const segment of filePath.split("/")) {
+    const lower = segment.toLowerCase();
+    if (lower.includes("__tests__") || lower.includes("__test__")) return true;
+  }
+  return false;
+}
+
+/** 后缀在白名单且路径为非测试fixture（不含 `__test__`/`__tests__` 片段）时为 true */
 export function pathMatchesLineDiffExtensions(
   filePath: string,
   extensions: readonly string[] = DEFAULT_LINE_DIFF_EXTENSIONS,
 ): boolean {
+  if (pathTouchesTestSegmentMarker(filePath)) return false;
   const basename = filePath.split("/").pop() ?? "";
   if (!basename.includes(".")) return false;
   const sorted = [...extensions].sort((a, b) => b.length - a.length);
