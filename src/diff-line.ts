@@ -61,25 +61,26 @@ export function lineBucketsFromTexts(oldText: string, newText: string): LineBuck
   const additions: number[] = [];
   const deletions: number[] = [];
 
-  const lineRangeDescending = (endLine: number, len: number): number[] =>
-    Array.from({ length: len }, (_, i) => endLine - i).reverse();
+  let newLine = 0;
+  let oldLine = 0;
 
-  const prefixSumInclusive = (lengths: number[], index: number): number =>
-    lengths.slice(0, index + 1).reduce((s, v) => s + v, 0);
-
-  const unchangedOnNewSide = changes.map((c) => (c.added || c.removed ? 0 : (c.count ?? 0)));
-  const unchangedOnOldSide = changes.map((c) => (c.added || c.removed ? 0 : (c.count ?? 0)));
-
-  changes.forEach((change, idx) => {
+  for (const change of changes) {
     const count = change.count ?? 0;
     if (change.added) {
-      const anchor = prefixSumInclusive(unchangedOnNewSide, idx) + 1;
-      additions.push(...lineRangeDescending(anchor + count - 1, count));
+      for (let i = 0; i < count; i++) {
+        additions.push(newLine + i + 1);
+      }
+      newLine += count;
     } else if (change.removed) {
-      const anchor = prefixSumInclusive(unchangedOnOldSide, idx) + 1;
-      deletions.push(...lineRangeDescending(anchor + count - 1, count));
+      for (let i = 0; i < count; i++) {
+        deletions.push(oldLine + i + 1);
+      }
+      oldLine += count;
+    } else {
+      newLine += count;
+      oldLine += count;
     }
-  });
+  }
 
   return { additions, deletions };
 }
