@@ -12,7 +12,7 @@
 `getCompare` 返回结构化结果 **`Compare`**：
 
 - **`commitList`**：`base` … `head` 范围内涉及的提交 id（来源 GitLab `repository/compare`）。
-- **`changedFiles`**：**仅保留扩展名为 `tsx` / `ts` / `jsx` / `js` 的文件**；每项含 **`path`** 以及 **`additions` / `deletions` 行号列表**（由 `diff` 对两侧全文做逐行比对得到）。不支持 Windows 路径风格，假定仓库路径均为 POSIX `/`。
+- **`changedFiles`**：**仅保留源码与常见模板后缀**（`ts` / `tsx` / `js` / `jsx` / `mjs` / `cjs` / `vue` / `svelte` / `astro` / `html` / `htm` / `njk` / `ejs` / `hbs` / `pug`）；每项含 **`path`** 以及 **`additions` / `deletions` 行号列表**（由 `diff` 对两侧全文做逐行比对得到）。不支持 Windows 路径风格，假定仓库路径均为 POSIX `/`。
 
 GitLab 侧会处理 **重命名**：在 `base` 与 `head` 上分别按 **旧路径 / 新路径** 拉取 Raw，再在统一展示路径上与行号结果对齐。
 

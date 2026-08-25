@@ -1,7 +1,23 @@
 import { diffLines } from "diff";
 
 /** 参与逐行 diff 的源码扩展名（不含点）；匹配时按后缀长度降序避免 `.tsx` 被当成 `.ts`。 */
-export const DEFAULT_LINE_DIFF_EXTENSIONS = ["tsx", "ts", "jsx", "js"] as const;
+export const DEFAULT_LINE_DIFF_EXTENSIONS = [
+  "tsx",
+  "ts",
+  "jsx",
+  "js",
+  "mjs",
+  "cjs",
+  "vue",
+  "svelte",
+  "astro",
+  "html",
+  "htm",
+  "njk",
+  "ejs",
+  "hbs",
+  "pug",
+] as const;
 
 /** 白名单后缀筛完后最多处理这么多文件（超出则整块不做 raw + 逐行比对） */
 export const LINE_DIFF_MAX_FILTERED_FILES = 1500;

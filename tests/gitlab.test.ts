@@ -240,7 +240,7 @@ describe("GitlabAdapter（本机 HTTP mock，响应体来自 JSON fixture）", (
       expect(compareHit?.search).toContain("to=headR");
     });
 
-    it("非白名单扩展名不会出现在 changedFiles（compare 仍只消费 .ts 等）", async () => {
+    it("非白名单扩展名不会出现在 changedFiles（如 README.md；源码与模板后缀会保留）", async () => {
       registerCompareResponse(mock.scenario, "p/mixed", "b0", "h0", compareMixed);
       registerRawScenario(mock.scenario, rawCompareMixedB);
       registerRawScenario(mock.scenario, rawCompareMixedH);

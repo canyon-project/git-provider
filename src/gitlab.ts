@@ -133,7 +133,7 @@ export class GitlabAdapter implements ScmAdapter {
     // 2. 每条 diff（可能含新增/删除/重命名）；后续只处理有可解析路径的条目
     const diffRows = data.diffs ?? [];
 
-    // 3. API 条目 → 「展示路径 + base/head 各自要拉的路径」（重命名时左右路径可不同）；再按后端白名单后缀筛掉不参与逐行 diff 的文件（如 .prisma）
+    // 3. API 条目 → 「展示路径 + base/head 各自要拉的路径」（重命名时左右路径可不同）；再按后端白名单后缀筛掉不参与逐行 diff 的文件（如 .prisma、.md）
     const comparedPaths = diffRows
       .map(comparedRefsFromGitlabDiff)
       .filter((entry): entry is NonNullable<typeof entry> => entry != null)
